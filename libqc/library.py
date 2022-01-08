@@ -39,6 +39,10 @@ class Brunello(GuideLibrary):
     _fasta_file_path = Path(__file__).resolve().parent.joinpath("lib/brunello.fa")
     _fasta_file_handler = None
 
+    def get_iter():
+        """Get a fresh iterator of type self."""
+        return __class__()
+
     def _reset(self):
         self._csv_file_handler.close()
         self._csv_file_handler = None

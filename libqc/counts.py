@@ -6,7 +6,7 @@ Stateful counts map.
 
 import re
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from .library import GuideLibrary
 
@@ -14,9 +14,8 @@ from .library import GuideLibrary
 class Counts:
     library: GuideLibrary = None
     count_map: Dict[str, int] = None
-    pattern: re.Pattern = None
 
-    def __init__(self, library: GuideLibrary, pattern: re.Pattern):
+    def __init__(self, library: GuideLibrary):
         """Holds on to count mapping.
 
         Params:
@@ -27,22 +26,22 @@ class Counts:
 
         self.library = library
         self.count_map = {}
-        self.pattern = pattern
-        self._cache = {}
 
         # Want all elements to have meaningful 0s.
         for name, _ in self.library:
             self.count_map[name] = 0
 
-    def process(self, read: str):
-        """Adds read to count table."""
+    def process(read: str, pattern: re.Pattern, library: GuideLibrary) -> Optional[str]:
+        """Adds read to count table.
+
+        Returns:
+            The element id found or None
+
+        """
 
         read = read.strip()
-        if read in self._cache:
-            self.count_map[self._cache[read]] += 1
-            return
 
-        match = self.pattern.search(read)
+        match = pattern.search(read)
         if not match:
             return
         else:
@@ -51,12 +50,9 @@ class Counts:
         if fragment is None or fragment == "":
             return
 
-        for name, sg_rna in self.library:
+        for name, sg_rna in library:
             if sg_rna in fragment:
-                self.count_map[name] += 1
-                self._cache[read] = name
-                self.library._reset()
-                return
+                return name
 
     def to_csv(self, sgrna_path: Path = None, gene_path: Path = None):
 
