@@ -4,4 +4,3 @@ build:
 
 publish: build
 	twine upload dist/*
-
