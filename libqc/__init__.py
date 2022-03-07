@@ -55,6 +55,9 @@ def make_counts(
                 continue
             i += 1
 
+    pool.close()
+    pool.join()
+
     i = 0
     while len(results) > 0:
         result = results.pop()
